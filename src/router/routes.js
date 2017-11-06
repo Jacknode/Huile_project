@@ -25,8 +25,7 @@ export default [
     path:'/home',
     name:'Home',
     components:{
-      default:Home,
-      newUser:Users
+      default:Home
     },
     children:[
       { path: 'profile', components: {
@@ -36,7 +35,7 @@ export default [
       { path: 'users', components: {
         default:Home,
         User:Users
-      } },
+      },name:'getUser' },
       { path: 'lntegration', components: {
         default:Home,
         User:UserLntegration

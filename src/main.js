@@ -14,6 +14,7 @@ import store from './store'
 
 Vue.use(ElementUI);
 
+
 Vue.config.productionTip = false;
 Vue.prototype.$http = axios;
 

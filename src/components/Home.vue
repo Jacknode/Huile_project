@@ -28,8 +28,8 @@
               </a>
 
               <ul class="dropdown-menu dropdown-menu-right">
-                <li><a href="javascript:;"><i class="icon-user-plus"></i>朱彬</a></li>
-                <li><a href="javascript:;"><i class="icon-switch2"></i>退出</a></li>
+                <li @click="getUser"><a href="javascript:;"><i class="icon-user-plus"></i>{{qiankeUser?qiankeUser:''}}</a></li>
+                <li @click="Quit"><a href="javascript:;"><i class="icon-switch2"></i>退出</a></li>
               </ul>
             </li>
           </ul>
@@ -56,7 +56,7 @@
                       <!--<img src="assets/images/placeholder.jpg" class="img-circle img-sm" alt="">-->
                     </a>
                     <div class="media-body">
-                      <span class="media-heading text-semibold">管理员</span>
+                      <span class="media-heading text-semibold">欢迎您:{{qiankeUser?qiankeUser:''}}</span>
                     </div>
                   </div>
                 </div>
@@ -138,10 +138,33 @@
 </template>
 <script>
   import User from './User.vue'
+  import {mapGetters} from 'vuex'
 export default{
   name: '',
+  data(){
+    return {
+      qiankeUser:''
+    }
+  },
   components:{
     User
+  },
+  computed:mapGetters([
+      'userInfo'
+  ]),
+  mounted(){
+    var user = window.localStorage.getItem('qianKeName');
+    this.qiankeUser = user;
+  },
+  methods:{
+    //退出
+    Quit(){
+      this.$router.push({ name: 'Login' })
+    },
+    //用户信息
+    getUser(){
+      this.$router.push({ name: 'getUser' })
+    }
   }
 }
 </script>

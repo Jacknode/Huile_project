@@ -38,15 +38,18 @@
       //登录
       login(){
         var _this = this;
+        var localStorage = window.localStorage;
         this.$http.post('/api/GetValidateByPassword',{
           UserID:_this.username,
           Password:_this.password
         })
           .then(data=>{
             var data = JSON.parse(data.data.d)
+            console.log(data.userInfo[0])
             if(Number(data.backCode)===200){
-              _this.$router.push({ name: 'Home' })
-              window.location.reload()
+              localStorage.setItem('qianKeName',data.userInfo[0].ui_Name);
+              _this.$router.push({ name: 'getUser' })
+              window.location.reload();
             }
             _this.$store.dispatch('setUserInfo',data.userInfo[0])
           })
@@ -54,9 +57,6 @@
             console.log(err);
           })
       }
-    },
-    mounted(){
-//    this.$store.dispatch('getMsg')
     }
   }
 </script>

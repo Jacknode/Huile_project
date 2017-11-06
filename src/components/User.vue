@@ -23,7 +23,7 @@
           </thead>
           <tbody>
           <tr v-for="item,index in userInfoListKeyWord">
-            <td>{{item.ui_UserCode}}</td>
+            <td>{{item.ui_ID}}</td>
             <td><a href="#">{{item.ui_Name}}</a></td>
             <td>{{item.ui_CertNo}}</td>
             <td>{{item.ui_Phone}}</td>
@@ -74,7 +74,7 @@
       <el-dialog title="用户修改" :visible.sync="dialogFormVisibleUpdate">
         <el-form :model="newForm">
           <el-form-item label="用户编号" :label-width="formLabelWidth">
-            <el-input v-model="newForm.ui_UserCode" auto-complete="off"></el-input>
+            <el-input v-model="newForm.ui_ID" auto-complete="off" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="用户名称" :label-width="formLabelWidth">
             <el-input v-model="newForm.ui_Name" auto-complete="off"></el-input>
@@ -137,7 +137,7 @@
           oldPassword:'',
           newPassword:''
         },
-        formLabelWidth: '120px'
+        formLabelWidth: '120px',
       }
     },
     methods:{
