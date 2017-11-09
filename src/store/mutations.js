@@ -181,6 +181,7 @@ const mutations = {
     state.userLntegrationWeightKeyWord = state.userLntegrationWeightKeyWord.map(item=>{
       if(item.hm_Code==data.hm_Code){
         return {
+          hm_ID:data.hm_ID,
           hm_Code:data.hm_Code,
           hm_Name:data.hm_Name,
           hm_Percent:data.hm_Percent

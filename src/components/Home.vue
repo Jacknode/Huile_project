@@ -155,6 +155,63 @@ export default{
   mounted(){
     var user = window.localStorage.getItem('qianKeName');
     this.qiankeUser = user;
+    //初始化订单类型数据
+    this.$http.post('/api/GetOrderTypeList',{
+      orderTypeCode:''
+    })
+      .then(data=>{
+        var data = JSON.parse(data.data.d);
+        if(data.backCode=='200'){
+          this.$store.commit('initOrderType',data.orderType);
+          this.$store.commit('initOrderTypeKeyWord',data.orderType);
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    //初始化渲染权重信息
+    this.$http.post('/api/GetHeightPercent',{
+      hmCode:'',
+      hmPersent:''
+    })
+      .then(data=>{
+        var data = JSON.parse(data.data.d);
+        if(data.backCode=='200'){
+          this.$store.commit('initUserLntegrationWeight',data.heightManage);
+          this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
+        }
+      })
+      .catch(err=>{
+        console.log(err)
+      })
+    //初始化订单类型数据
+    this.$http.post('/api/GetOrderTypeList',{
+      orderTypeCode:''
+    })
+      .then(data=>{
+        console.log(data)
+        var data = JSON.parse(data.data.d);
+        if(data.backCode=='200'){
+          this.$store.commit('initOrderType',data.orderType);
+          this.$store.commit('initOrderTypeKeyWord',data.orderType);
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
+    this.$http.post('/api/GetOrderList',{
+      condition:''
+    })
+      .then(data=>{
+        var data = JSON.parse(data.data.d);
+        if(data.backCode=='200'){
+          this.$store.commit('initOrderList',data.orderInfo);
+          this.$store.commit('initOrderListKeyWord',data.orderInfo);
+        }
+      })
+      .catch(err=>{
+        console.log(err);
+      })
   },
   methods:{
     //退出

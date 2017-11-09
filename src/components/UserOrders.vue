@@ -88,34 +88,7 @@
       }
     },
     mounted(){
-      //初始化订单类型数据
-      this.$http.post('/api/GetOrderTypeList',{
-        orderTypeCode:''
-      })
-        .then(data=>{
-          console.log(data)
-          var data = JSON.parse(data.data.d);
-          if(data.backCode=='200'){
-            this.$store.commit('initOrderType',data.orderType);
-            this.$store.commit('initOrderTypeKeyWord',data.orderType);
-          }
-        })
-        .catch(err=>{
-          console.log(err);
-        })
-      this.$http.post('/api/GetOrderList',{
-        condition:''
-      })
-        .then(data=>{
-          var data = JSON.parse(data.data.d);
-          if(data.backCode=='200'){
-            this.$store.commit('initOrderList',data.orderInfo);
-            this.$store.commit('initOrderListKeyWord',data.orderInfo);
-          }
-        })
-        .catch(err=>{
-          console.log(err);
-        })
+
     }
   }
 </script>

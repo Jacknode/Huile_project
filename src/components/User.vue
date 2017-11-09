@@ -98,7 +98,7 @@
       <el-dialog title="修改密码" :visible.sync="dialogFormUpdatePassword">
         <el-form :model="formPassword">
           <el-form-item label="用户账号" :label-width="formLabelWidth">
-            <el-input v-model="formPassword.userCode" auto-complete="off"></el-input>
+            <el-input v-model="formPassword.userCode" auto-complete="off" :disabled="true"></el-input>
           </el-form-item>
           <el-form-item label="旧密码" :label-width="formLabelWidth">
             <el-input v-model="formPassword.oldPassword" auto-complete="off" type="password"></el-input>
@@ -260,6 +260,7 @@
                 type: 'success'
               });
             }
+            this.dialogFormUpdatePassword = false;
           })
           .catch(err=>{
             console.log(err);
