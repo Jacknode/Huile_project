@@ -26,6 +26,7 @@
   </div>
 </template>
 <script>
+  import {POST} from '../assets/js/universal'
   export default{
     name: '',
     data(){
@@ -37,25 +38,30 @@
     methods:{
       //登录
       login(){
+//        POST('http://114.55.248.116:1001/Service.asmx/GetSceneryList',{
+//          tbUserID:''
+//        },(data)=>{
+//          var data = JSON.parse(data);
+//          if(data.backCode ==200){
+//            this.$store.commit('initAgencies',data.touristBussinsesses)
+//            this.$store.commit('initAgenciesKeyWord',data.touristBussinsesses)
+//          }
+//        })
         var _this = this;
         var localStorage = window.localStorage;
-        this.$http.post('/api/GetValidateByPassword',{
+        POST('http://114.55.248.116:1001/Service.asmx/GetValidateByPassword',{
           UserID:_this.username,
           Password:_this.password
+        },(data)=>{
+          var data = JSON.parse(data)
+          console.log(data.userInfo[0])
+          if(Number(data.backCode)===200){
+            localStorage.setItem('qianKeName',data.userInfo[0].ui_Name);
+            _this.$router.push({ name: 'getUser' })
+            window.location.reload();
+          }
+          _this.$store.dispatch('setUserInfo',data.userInfo[0])
         })
-          .then(data=>{
-            var data = JSON.parse(data.data.d)
-            console.log(data.userInfo[0])
-            if(Number(data.backCode)===200){
-              localStorage.setItem('qianKeName',data.userInfo[0].ui_Name);
-              _this.$router.push({ name: 'getUser' })
-              window.location.reload();
-            }
-            _this.$store.dispatch('setUserInfo',data.userInfo[0])
-          })
-          .catch(function(err){
-            console.log(err);
-          })
       }
     }
   }

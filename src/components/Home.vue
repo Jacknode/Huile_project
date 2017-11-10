@@ -72,7 +72,7 @@
                     <!-- Main -->
                     <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
                     <li>
-                      <a href="javascript:;"><i class="icon-stack2"></i> <span>用户管理</span></a>
+                      <a href="javascript:;"><i class="icon-stack2"></i> <span>用户信息管理</span></a>
                       <ul>
                         <li>
                           <router-link to="/home/users">用户信息</router-link>
@@ -81,7 +81,7 @@
                           <router-link to="/home/profile">用户订单详情</router-link>
                         </li>
                         <li>
-                          <router-link to="/home/lntegration">用户积分明细</router-link>
+                          <router-link to="/home/lntegration">用户积分明细管理</router-link>
                         </li>
                         <li>
                           <router-link to="/home/lntegrationWeight">积分项目权重管理</router-link>
@@ -104,7 +104,7 @@
           <!--右边内容-->
           <div class="content-wrapper">
 
-            <div class="content">
+            <div class="content" :class="{ 'animated': transtionActive.isActive, 'rotateInDownRight': transtionActive.isRotateInDownRight }">
               <!-- Page length options -->
                 <!-- /page length options -->
               <router-view name="User"></router-view>
@@ -139,6 +139,7 @@
 <script>
   import User from './User.vue'
   import {mapGetters} from 'vuex'
+  import {POST} from '../assets/js/universal'
 export default{
   name: '',
   data(){
@@ -150,68 +151,65 @@ export default{
     User
   },
   computed:mapGetters([
-      'userInfo'
+      'userInfo',
+      'transtionActive'
   ]),
+  watch: {
+    '$route' (to, from) {
+      // 对路由变化作出响应...
+      if(this.transtionActive.isActive&&this.transtionActive.isRotateInDownRight){
+        this.$store.commit('setTranstionFalse')
+      }
+      setTimeout(()=>{
+        this.$store.commit('oPTranstionFalse')
+//          this.isActive = !this.isActive;
+//          this.isRotateInDownRight = !this.isRotateInDownRight
+      },10)
+    }
+  },
   mounted(){
     var user = window.localStorage.getItem('qianKeName');
     this.qiankeUser = user;
     //初始化订单类型数据
-    this.$http.post('/api/GetOrderTypeList',{
+    POST('http://114.55.248.116:1001/Service.asmx/GetOrderTypeList',{
       orderTypeCode:''
+    },(data)=>{
+      var data = JSON.parse(data);
+      if(data.backCode=='200'){
+        this.$store.commit('initOrderType',data.orderType);
+        this.$store.commit('initOrderTypeKeyWord',data.orderType);
+      }
     })
-      .then(data=>{
-        var data = JSON.parse(data.data.d);
-        if(data.backCode=='200'){
-          this.$store.commit('initOrderType',data.orderType);
-          this.$store.commit('initOrderTypeKeyWord',data.orderType);
-        }
-      })
-      .catch(err=>{
-        console.log(err);
-      })
     //初始化渲染权重信息
-    this.$http.post('/api/GetHeightPercent',{
+    POST('http://114.55.248.116:1001/Service.asmx/GetHeightPercent',{
       hmCode:'',
       hmPersent:''
+    },(data)=>{
+      var data = JSON.parse(data);
+      if(data.backCode=='200'){
+        this.$store.commit('initUserLntegrationWeight',data.heightManage);
+        this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
+      }
     })
-      .then(data=>{
-        var data = JSON.parse(data.data.d);
-        if(data.backCode=='200'){
-          this.$store.commit('initUserLntegrationWeight',data.heightManage);
-          this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
-        }
-      })
-      .catch(err=>{
-        console.log(err)
-      })
     //初始化订单类型数据
-    this.$http.post('/api/GetOrderTypeList',{
+    POST('http://114.55.248.116:1001/Service.asmx/GetOrderTypeList',{
       orderTypeCode:''
+    },(data)=>{
+      var data = JSON.parse(data);
+      if(data.backCode=='200'){
+        this.$store.commit('initOrderType',data.orderType);
+        this.$store.commit('initOrderTypeKeyWord',data.orderType);
+      }
     })
-      .then(data=>{
-        console.log(data)
-        var data = JSON.parse(data.data.d);
-        if(data.backCode=='200'){
-          this.$store.commit('initOrderType',data.orderType);
-          this.$store.commit('initOrderTypeKeyWord',data.orderType);
-        }
-      })
-      .catch(err=>{
-        console.log(err);
-      })
-    this.$http.post('/api/GetOrderList',{
+    POST('http://114.55.248.116:1001/Service.asmx/GetOrderList',{
       condition:''
+    },(data)=>{
+      var data = JSON.parse(data);
+      if(data.backCode=='200'){
+        this.$store.commit('initOrderList',data.orderInfo);
+        this.$store.commit('initOrderListKeyWord',data.orderInfo);
+      }
     })
-      .then(data=>{
-        var data = JSON.parse(data.data.d);
-        if(data.backCode=='200'){
-          this.$store.commit('initOrderList',data.orderInfo);
-          this.$store.commit('initOrderListKeyWord',data.orderInfo);
-        }
-      })
-      .catch(err=>{
-        console.log(err);
-      })
   },
   methods:{
     //退出

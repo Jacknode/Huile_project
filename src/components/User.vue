@@ -37,7 +37,7 @@
                 </a>
 
                   <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="javascript:;" @click="dialogFormVisible = true"><i class="icon-add"></i>添加 </a></li>
+                    <li><a href="javascript:;" @click="addUser"><i class="icon-add"></i>添加 </a></li>
                     <li><a href="javascript:;" @click="updateUser(item.ui_UserCode)"><i class="icon-pencil"></i> 修改</a></li>
                     <li><a href="javascript:;" @click="updatePasswordUser(item.ui_UserCode)"><i class="icon-pencil7"></i> 密码修改</a></li>
                     <li><a href="javascript:;" @click="deleteUser(item.ui_UserCode)"><i class="icon-delicious"></i> 删除</a></li>
@@ -118,6 +118,7 @@
   import {mapGetters} from 'vuex'
   import dateFormat from '../assets/js/dateFormat'
   import publicInit from '../assets/js/public'
+  import {POST} from '../assets/js/universal'
   export default{
     name: '',
     data(){
@@ -147,124 +148,125 @@
       },
       //初始化修改数据
       updateUser(id){
+        this.$store.commit('setTranstionFalse')
         this.dialogFormVisibleUpdate = true;
         this.$store.commit('initUpdateUser',id)
       },
+      //添加用户
+      addUser(){
+        this.$store.commit('setTranstionFalse')
+        this.dialogFormVisible = true;
+      },
       //添加用户提交
       addSubmit(){
-        this.$http.post('/api/AddUser',this.form)
-          .then(data=>{
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              var date = new Date();
-              this.$store.commit('addNewUser',{
-                ui_UserCode:this.form.userCode,
-                ui_Name:this.form.userName,
-                ui_Phone:this.form.phone,
-                ui_CreateTime:dateFormat("yyyy/MM/dd hh:mm:ss",date)
-              })
-            }
-            this.dialogFormVisible = false
-          })
-          .catch(err=>{
-            console.log(err)
-          })
-      },
-      addUser(){
-        console.log('添加')
+
+        POST('http://114.55.248.116:1001/Service.asmx/AddUser',this.form,(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+            var date = new Date();
+            this.$store.commit('addNewUser',{
+              ui_UserCode:this.form.userCode,
+              ui_Name:this.form.userName,
+              ui_Phone:this.form.phone,
+              ui_CreateTime:dateFormat("yyyy/MM/dd hh:mm:ss",date)
+            })
+          }
+          this.dialogFormVisible = false
+        })
       },
       //修改用户提交
       updateSubmit(){
-        this.$http.post('/api/UpdateUserInfo',{
+
+        POST('http://114.55.248.116:1001/Service.asmx/UpdateUserInfo',{
           userID:this.newForm.ui_ID,
           userCode:this.newForm.ui_UserCode,
           userName:this.newForm.ui_Name,
           certNo:this.newForm.ui_CertNo,
           phone:this.newForm.ui_Phone,
           remark:this.newForm.ui_Remark
-        })
-          .then(data=>{
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              var date = new Date();
-              this.$store.commit('updateNewUser',{
-                userID:this.newForm.ui_ID,
-                userCode:this.newForm.ui_UserCode,
-                userName:this.newForm.ui_Name,
-                certNo:this.newForm.ui_CertNo,
-                phone:this.newForm.ui_Phone,
-                remark:this.newForm.ui_Remark,
-                createTime:dateFormat("yyyy/MM/dd hh:mm:ss",date)
-              })
-            }
-            this.dialogFormVisibleUpdate = false
-          })
-          .catch(err=>{
-            console.log(err)
-          })
-      },
-      //删除用户
-      deleteUser(id){
-        this.$http.post('/api/DeleteUserInfo',{
-          userCode:id
-        })
-          .then(data=>{
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$store.commit('filterUserInfo',id);
-            }
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
             this.$message({
               showClose: true,
               message: code.backResult,
               type: 'success'
             });
-          })
-          .catch(err=>{
-            console.log(err);
-          })
+            var date = new Date();
+            this.$store.commit('updateNewUser',{
+              userID:this.newForm.ui_ID,
+              userCode:this.newForm.ui_UserCode,
+              userName:this.newForm.ui_Name,
+              certNo:this.newForm.ui_CertNo,
+              phone:this.newForm.ui_Phone,
+              remark:this.newForm.ui_Remark,
+              createTime:dateFormat("yyyy/MM/dd hh:mm:ss",date)
+            })
+          }
+          this.dialogFormVisibleUpdate = false
+        })
+      },
+      //删除用户
+      deleteUser(id){
+        POST('http://114.55.248.116:1001/Service.asmx/DeleteUserInfo',{
+          userCode:id
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$store.commit('filterUserInfo',id);
+          }
+          this.$message({
+            showClose: true,
+            message: code.backResult,
+            type: 'success'
+          });
+        })
       },
       //密码修改
       updatePasswordUser(userCode){
+        this.$store.commit('setTranstionFalse')
         this.dialogFormUpdatePassword = true;
         this.formPassword.userCode = userCode;
       },
       //密码修改提交
       dialogUpdatePassword(){
         this.dialogFormUpdatePassword = false;
-        this.$http.post('/api/UpdateUserInfoPassword',{
+        POST('http://114.55.248.116:1001/Service.asmx/UpdateUserInfoPassword',{
           userCode:this.formPassword.userCode,
           oldPassword:this.formPassword.oldPassword,
           newPassword:this.formPassword.newPassword
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+          }
+          this.dialogFormUpdatePassword = false;
         })
-          .then(data=>{
-            console.log(data)
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-            }
-            this.dialogFormUpdatePassword = false;
-          })
-          .catch(err=>{
-            console.log(err);
-          })
+      },
+      initData(){
+        POST('http://114.55.248.116:1001/Service.asmx/GetUserInfoList',{
+          condition:'',
+          key:''
+        },(data)=>{
+          var data = JSON.parse(data);
+          if(Number(data.backCode)===200){
+            this.$store.commit('setUserInfoList',data.userInfo)
+            this.$store.commit('setSearchKeyWord',data.userInfo)
+          }
+        })
       }
     },
     computed:mapGetters([
@@ -273,20 +275,7 @@
       'newForm'
     ]),
     mounted(){
-      this.$http.post(`/api/GetUserInfoList`,{
-        condition:'dadada',
-        key:'dada'
-      })
-        .then(data=>{
-          var data = JSON.parse(data.data.d);
-          if(Number(data.backCode)===200){
-            this.$store.commit('setUserInfoList',data.userInfo)
-            this.$store.commit('setSearchKeyWord',data.userInfo)
-          }
-        })
-        .catch(err=>{
-          console.log(err)
-        })
+      this.initData()
     }
   }
 </script>

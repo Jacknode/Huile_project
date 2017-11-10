@@ -8,7 +8,6 @@ import '@/assets/css/icons/icomoon/styles.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import '@/assets/js/login';
 import App from './App'
-import axios from 'axios'
 import router from './router'
 import store from './store'
 
@@ -16,7 +15,6 @@ Vue.use(ElementUI);
 
 
 Vue.config.productionTip = false;
-Vue.prototype.$http = axios;
 
 /* eslint-disable no-new */
 new Vue({

@@ -47,6 +47,7 @@
 <script>
   import {mapGetters} from 'vuex'
   import publicInit from '../assets/js/public'
+  import {POST} from '../assets/js/universal'
   export default{
     name: '',
     data(){
@@ -65,26 +66,20 @@
       },
       //删除订单
       deleteOrder(id){
-        console.log(id);
-        this.$http.post('/api/DeleteOrder',{
+        POST('http://114.55.248.116:1001/Service.asmx/DeleteOrder',{
           orderCode:id
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$store.commit('filterOrder',id);
+          }
+          this.$message({
+            showClose: true,
+            message: code.backResult,
+            type: 'success'
+          });
         })
-          .then(data=>{
-            console.log(data)
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$store.commit('filterOrder',id);
-            }
-            this.$message({
-              showClose: true,
-              message: code.backResult,
-              type: 'success'
-            });
-          })
-          .catch(err=>{
-            console.log(err)
-          })
       }
     },
     mounted(){

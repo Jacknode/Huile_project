@@ -30,7 +30,7 @@
                     <i class="icon-menu9"></i>
                   </a>
                   <ul class="dropdown-menu dropdown-menu-right">
-                    <li><a href="javascript:;" @click="addUserLntegrationWeight = true"><i class="icon-add"></i>添加 </a></li>
+                    <li><a href="javascript:;" @click="addWeight"><i class="icon-add"></i>添加 </a></li>
                     <li><a href="javascript:;" @click="UpdateLntegrationWeight(item.hm_Code)"><i class="icon-pencil"></i> 修改</a></li>
                   </ul>
                 </li>
@@ -79,6 +79,7 @@
 <script>
   import {mapGetters} from 'vuex'
   import publicInit from '../assets/js/public' //根据返回backCode的弹窗函数
+  import {POST} from '../assets/js/universal'
   export default{
     name: '',
     data(){
@@ -105,78 +106,70 @@
       },
       //初始化渲染权重信息
       initData(){
-        this.$http.post('/api/GetHeightPercent',{
+        POST('http://114.55.248.116:1001/Service.asmx/GetHeightPercent',{
           hmCode:'',
           hmPersent:''
+        },(data)=>{
+          var data = JSON.parse(data);
+          if(data.backCode=='200'){
+            this.$store.commit('initUserLntegrationWeight',data.heightManage);
+            this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
+          }
         })
-          .then(data=>{
-            var data = JSON.parse(data.data.d);
-            if(data.backCode=='200'){
-              this.$store.commit('initUserLntegrationWeight',data.heightManage);
-              this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
-            }
-          })
-          .catch(err=>{
-            console.log(err)
-          })
       },
-      //添加积分权重
+      //添加点击
+      addWeight(){
+        this.$store.commit('setTranstionFalse')
+        this.addUserLntegrationWeight = true
+      },
+      //添加积分权重提交
       dialogAddUserLntegrationWeight(){
-        this.$http.post('/api/AddHeightItem',{
+        POST('http://114.55.248.116:1001/Service.asmx/AddHeightItem',{
           hmCode:this.LntegrationWeight.code,
           hmName:this.LntegrationWeight.name,
           percent:this.LntegrationWeight.percent
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+            this.$store.commit('AddHeightItem',{
+              hmCode:this.LntegrationWeight.code,
+              hmName:this.LntegrationWeight.name,
+              percent:this.LntegrationWeight.percent
+            })
+          }
+          this.addUserLntegrationWeight = false
         })
-          .then(data=>{
-            console.log(JSON.parse(data.data.d))
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              this.$store.commit('AddHeightItem',{
-                hmCode:this.LntegrationWeight.code,
-                hmName:this.LntegrationWeight.name,
-                percent:this.LntegrationWeight.percent
-              })
-            }
-            this.addUserLntegrationWeight = false
-          })
-          .catch(err=>{
-            console.log(err)
-          })
       },
       //修改积分权重
       UpdateLntegrationWeight(code){
+        this.$store.commit('setTranstionFalse')
         this.updateUserLntegrationWeight = true;
         this.$store.commit('initUpdateLntegrationWeight',code)
       },
-      //修改积分权重
+      //修改积分权重提交
       dialogUpdateLntegrationWeight(){
-        this.$http.post('/api/UpdateHeightPercent',{
+        POST('http://114.55.248.116:1001/Service.asmx/UpdateHeightPercent',{
           hmCode:this.initLntegrationWeight.hm_Code,
           hmPersent:this.initLntegrationWeight.hm_Percent
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+            this.$store.commit('updateNewLntegrationWeight',this.initLntegrationWeight)
+          }
+          this.updateUserLntegrationWeight = false
         })
-          .then(data=>{
-            console.log(data)
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              this.$store.commit('updateNewLntegrationWeight',this.initLntegrationWeight)
-            }
-            this.updateUserLntegrationWeight = false
-          })
-          .catch(err=>{
-            console.log(err)
-          })
       }
     },
     mounted(){

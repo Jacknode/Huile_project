@@ -1,5 +1,10 @@
 import getters from './getters';
 const state ={
+  //初始化动画
+  transtionActive:{
+    isActive:false,
+    isRotateInDownRight:false
+  },
   userInfo:{},
   userInfoList:[],
   userInfoListKeyWord:[],
@@ -19,6 +24,19 @@ const state ={
   userScoreList:[],//用户积分明细
 };
 const mutations = {
+  //初始化动画
+  setTranstionFalse(state){
+    state.transtionActive = {
+      isActive:false,
+      isRotateInDownRight:false
+    }
+  },
+  oPTranstionFalse(){
+    state.transtionActive = {
+      isActive:!state.transtionActive.isActive,
+      isRotateInDownRight:!state.transtionActive.isRotateInDownRight
+    }
+  },
   //登录信息
   setUserInfo(state,userInfo){
     state.userInfo = userInfo;

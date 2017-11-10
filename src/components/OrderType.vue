@@ -28,7 +28,7 @@
                   <i class="icon-menu9"></i>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-right">
-                  <li><a href="javascript:;" @click="addOrderType = true"><i class="icon-add"></i>添加 </a></li>
+                  <li><a href="javascript:;" @click="addType"><i class="icon-add"></i>添加 </a></li>
                   <li><a href="javascript:;" @click="updateInit(item.ot_Code)"><i class="icon-pencil"></i> 修改</a></li>
                   <li><a href="javascript:;" @click="deleteType(item.ot_Code)"><i class="icon-delicious"></i> 删除</a></li>
                 </ul>
@@ -72,6 +72,7 @@
 <script>
   import {mapGetters} from 'vuex'
   import publicInit from '../assets/js/public' //根据返回backCode的弹窗函数
+  import {POST} from '../assets/js/universal'
   export default{
     name: '',
     data(){
@@ -97,102 +98,93 @@
       search(){
         this.$store.commit('searchOrderKeyWord',this.orderType)
       },
+      //添加点击
+      addType(){
+        this.$store.commit('setTranstionFalse')
+        this.addOrderType = true;
+      },
       //订单添加提交
       dialogAddOrderType(){
-        this.$http.post('/api/AddOrderType',{
+        POST('http://114.55.248.116:1001/Service.asmx/AddOrderType',{
           orderTypeCode:this.formType.id,
           orderTypeName:this.formType.name
-        })
-          .then(data=>{
-            console.log(data)
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              this.$store.commit('addOrderType',{
-                ot_Code:this.formType.id,
-                ot_TypeName:this.formType.name
-              })
-            }
-            this.addOrderType = false
-          })
-          .catch(err=>{
-            console.log(err)
-          })
-      },
-      //订单类型初始化
-      updateInit(id){
-        this.updateOrderType = true;
-        this.$store.commit('initUpdateType',id)
-      },
-      //订单类型修改
-      dialogUpdateOrderType(){
-        this.$http.post('/api/UpdateOrderType',{
-          orderTypeCode:this.initType.ot_Code,
-          orderTypeName:this.initType.ot_TypeName
-        })
-          .then(data=>{
-            console.log(data)
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              this.$store.commit('updateNewOrderType',{
-                ot_Code:this.initType.ot_Code,
-                ot_TypeName:this.initType.ot_TypeName
-              })
-            }
-            this.updateOrderType = false
-          })
-          .catch(err=>{
-            console.log(err);
-          })
-      },
-      //订单删除
-      deleteType(id){
-        this.$http.post('/api/DeleteOrderType',{
-          orderTypeCode:id
-        })
-          .then(data=>{
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200){
-              this.$store.commit('filterOrderType',id);
-            }
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
             this.$message({
               showClose: true,
               message: code.backResult,
               type: 'success'
             });
-          })
-          .catch(err=>{
-            console.log(err)
-          })
-      }
-    },
-    mounted(){
-      //初始化订单类型数据
-      this.$http.post('/api/GetOrderTypeList',{
-        orderTypeCode:''
-      })
-        .then(data=>{
-          var data = JSON.parse(data.data.d);
+            this.$store.commit('addOrderType',{
+              ot_Code:this.formType.id,
+              ot_TypeName:this.formType.name
+            })
+          }
+          this.addOrderType = false
+        })
+      },
+      //订单类型初始化
+      updateInit(id){
+        this.$store.commit('setTranstionFalse')
+        this.updateOrderType = true;
+        this.$store.commit('initUpdateType',id)
+      },
+      //订单类型修改
+      dialogUpdateOrderType(){
+        POST('http://114.55.248.116:1001/Service.asmx/UpdateOrderType',{
+          orderTypeCode:this.initType.ot_Code,
+          orderTypeName:this.initType.ot_TypeName
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+            this.$store.commit('updateNewOrderType',{
+              ot_Code:this.initType.ot_Code,
+              ot_TypeName:this.initType.ot_TypeName
+            })
+          }
+          this.updateOrderType = false
+        })
+      },
+      //订单删除
+      deleteType(id){
+        POST('http://114.55.248.116:1001/Service.asmx/DeleteOrderType',{
+          orderTypeCode:id
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200){
+            this.$store.commit('filterOrderType',id);
+          }
+          this.$message({
+            showClose: true,
+            message: code.backResult,
+            type: 'success'
+          });
+        })
+      },
+      initData(){
+        //初始化订单类型数据
+        POST('http://114.55.248.116:1001/Service.asmx/GetOrderTypeList',{
+          orderTypeCode:''
+        },(data)=>{
+          var data = JSON.parse(data);
           if(data.backCode=='200'){
             this.$store.commit('initOrderType',data.orderType);
             this.$store.commit('initOrderTypeKeyWord',data.orderType);
           }
         })
-        .catch(err=>{
-          console.log(err);
-        })
+      }
+    },
+    mounted(){
+      this.initData();
     }
   }
 </script>

@@ -47,6 +47,7 @@
 <script>
   import {getDateName} from '../assets/js/date'
   import publicInit from '../assets/js/public'
+  import {POST} from '../assets/js/universal'
 
   import {mapGetters} from 'vuex'
   export default{
@@ -101,33 +102,29 @@
           });
           return;
         }
-        this.$http.post('/api/GetScoreList',{
+        POST('http://114.55.248.116:1001/Service.asmx/GetScoreList',{
           userInfoID:this.userID,
           fromTime:this.dateArr[0],
           endTime:this.dateArr[1]
+        },(data)=>{
+          var code = JSON.parse(data);
+          publicInit.isBackCode(code,this)
+          if(Number(code.backCode)==200&&code.userScore.length){
+            this.$message({
+              showClose: true,
+              message: code.backResult,
+              type: 'success'
+            });
+            this.$store.commit('initUserScore',code.userScore)
+          }else{
+            this.$message({
+              showClose: true,
+              message: '查询失败',
+              type: 'error'
+            });
+            this.$store.commit('clearUserScore')
+          }
         })
-          .then(data=>{
-            var code = JSON.parse(data.data.d);
-            publicInit.isBackCode(code,this)
-            if(Number(code.backCode)==200&&code.userScore.length){
-              this.$message({
-                showClose: true,
-                message: code.backResult,
-                type: 'success'
-              });
-              this.$store.commit('initUserScore',code.userScore)
-            }else{
-              this.$message({
-                showClose: true,
-                message: '查询失败',
-                type: 'error'
-              });
-              this.$store.commit('clearUserScore')
-            }
-          })
-          .catch(err=>{
-            console.log(err)
-          })
       },
       //获取选中时间
       getDateArray(arr){
@@ -136,25 +133,24 @@
           dateArr.push(getDateName(arr[i],'-'));
         }
         this.$store.commit('setDate',dateArr);
+      },
+      initData(){
+        POST('http://114.55.248.116:1001/Service.asmx/GetHeightPercent',{
+          hmCode:'',
+          hmPersent:''
+        },(data)=>{
+          var data = JSON.parse(data);
+          if(data.backCode=='200'){
+            this.$store.commit('initUserLntegrationWeight',data.heightManage);
+            this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
+          }
+        })
       }
     },
     mounted(){
       //如果权重不存在则添加初始化
       if(!this.userLntegrationWeightKeyWord.length){
-        this.$http.post('/api/GetHeightPercent',{
-          hmCode:'',
-          hmPersent:''
-        })
-          .then(data=>{
-            var data = JSON.parse(data.data.d);
-            if(data.backCode=='200'){
-              this.$store.commit('initUserLntegrationWeight',data.heightManage);
-              this.$store.commit('initUserLntegrationWeightKeyWord',data.heightManage);
-            }
-          })
-          .catch(err=>{
-            console.log(err)
-          })
+        this.initData()
       }
     }
   }

@@ -2,6 +2,9 @@
  * Created by leibo on 17/10/30.
  */
 export default {
+  transtionActive(state){
+    return state.transtionActive;
+  },
   loadingShow(state) {
     return state.loadingShow
   },
